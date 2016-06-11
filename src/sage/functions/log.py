@@ -359,8 +359,10 @@ class Function_polylog(GinacFunction):
             1/6*pi^2
             sage: polylog(2,x^2+1)
             polylog(2, x^2 + 1)
-            sage: polylog(4,0.5)
-            polylog(4, 0.500000000000000)
+            sage: polylog(4, 1/2)
+            polylog(4, 1/2)
+            sage: polylog(4, 0.5)
+            0.517479061673899
 
             sage: f = polylog(4, 1); f
             1/90*pi^4
@@ -393,7 +395,7 @@ class Function_polylog(GinacFunction):
             sage: t.operator() == polylog
             True
             sage: t.subs(x=.5).n()
-            0.508400579242269
+            0.50840057924226...
         """
         GinacFunction.__init__(self, "polylog", nargs=2)
 
