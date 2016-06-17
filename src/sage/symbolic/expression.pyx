@@ -5792,8 +5792,8 @@ cdef class Expression(CommutativeRingElement):
         The behaviour is undefined with noninteger or negative exponents::
 
             sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + x^x
-            sage: p.coefficients(x)
-            [[1, -1], [x^x, 0], [y, 1], [17/3*a, 3/2]]
+            sage: sorted(p.coefficients(x), key = operator.itemgetter(1))
+            [[1, -1], [y, 1], [17/3*a, 3/2], [1, x]]
             sage: p.coefficients(x, sparse=False)
             Traceback (most recent call last):
             ...
@@ -5829,21 +5829,25 @@ cdef class Expression(CommutativeRingElement):
             [[t, 0], [3, 1], [1, 2]]
 
         """
-        f = self._maxima_()
-        maxima = f.parent()
-        maxima._eval_line('load(coeflist)')
+        cdef vector[pair[GEx,GEx]] vec
+        cdef pair[GEx,GEx] gexpair
+        cdef Expression xx
         if x is None:
             x = self.default_variable()
-        G = f.coeffs(x)
-        from sage.calculus.calculus import symbolic_expression_from_maxima_string
-        S = symbolic_expression_from_maxima_string(repr(G))
-        l = S[1:]
+        xx = self.coerce_in(x)
+        self._gobj.coefficients(xx._gobj, vec)
+        l = []
+        for p in vec:
+            l.append([new_Expression_from_GEx(self._parent, p.first),
+                new_Expression_from_GEx(self._parent, p.second)])
         if sparse is True:
             return l
         else:
             from sage.rings.integer_ring import ZZ
             if any(not c[1] in ZZ for c in l):
                 raise ValueError("Cannot return dense coefficient list with noninteger exponents.")
+            if not l:
+                l = [[0, 0]]
             val = l[0][1]
             if val < 0:
                 raise ValueError("Cannot return dense coefficient list with negative valuation.")
