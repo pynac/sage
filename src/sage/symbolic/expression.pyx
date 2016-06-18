@@ -6154,16 +6154,11 @@ cdef class Expression(CommutativeRingElement):
             2*a^2 - (2*sqrt(2)*a - 1)*x + x^2 + 1
         """
         from sage.symbolic.ring import SR
-        f = self._maxima_()
-        P = f.parent()
-        P._eval_line('load(coeflist)')
         if x is None:
             x = self.default_variable()
-        x = self._parent.var(repr(x))
-        G = f.coeffs(x)
+        G = self.coefficients(x)
         ans = None
-        for i in range(1, len(G)):
-            Z = G[i]
+        for Z in G:
             coeff = SR(Z[0])
             n = SR(Z[1])
             if repr(coeff) != '0':
