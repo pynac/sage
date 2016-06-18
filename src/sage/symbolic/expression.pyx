@@ -8375,6 +8375,18 @@ cdef class Expression(CommutativeRingElement):
                     a*y^2 - a*x - 7*b*x - 7*c*x - 7*a - 7*b - 7*c)/((x^2 -
                         7)*a*(x + 1))
 
+        TESTS:
+
+        Check that :trac:`20843` is fixed::
+
+            sage: var('a y')
+            (a, y)
+            sage: ((x - 2*y)^4/(x^2 - 4*y^2)^2).normalize()
+            (x^2 - 4*x*y + 4*y^2)/(x^2 + 4*x*y + 4*y^2)
+            sage: f = ((x - 2*y)^4/(x^2 - 4*y^2)^2 + 1)*(y + a)*(2*y + x) / (4*y^2 + x^2)
+            sage: f.normalize()
+            2*(a + y)/(x + 2*y)
+
         ALGORITHM: Uses GiNaC.
 
         """
