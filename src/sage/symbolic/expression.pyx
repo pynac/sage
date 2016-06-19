@@ -8372,15 +8372,18 @@ cdef class Expression(CommutativeRingElement):
 
         TESTS:
 
-        Check that :trac:`20843` is fixed::
+        Check that :trac:`19775` is fixed::
 
-            sage: var('a y')
-            (a, y)
+            sage: a,b,c,d,e,y = var('a,b,c,d,e,y')
             sage: ((x - 2*y)^4/(x^2 - 4*y^2)^2).normalize()
             (x^2 - 4*x*y + 4*y^2)/(x^2 + 4*x*y + 4*y^2)
             sage: f = ((x - 2*y)^4/(x^2 - 4*y^2)^2 + 1)*(y + a)*(2*y + x) / (4*y^2 + x^2)
             sage: f.normalize()
             2*(a + y)/(x + 2*y)
+            sage: (c/a - b*c^2/(a^2*(b*c/a-d)) + c*d/(a*(b*c/a-d))).normalize()
+            0
+            sage: (e + c/a - b*c^2/(a^2*(b*c/a-d)) + c*d/(a*(b*c/a-d))).normalize()
+            e
 
         ALGORITHM: Uses GiNaC.
 
