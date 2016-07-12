@@ -5790,8 +5790,9 @@ cdef class Expression(CommutativeRingElement):
         The behaviour is undefined with noninteger or negative exponents::
 
             sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + x^x
-            sage: sorted(p.coefficients(x), key = operator.itemgetter(1))
-            [[1, -1], [y, 1], [17/3*a, 3/2], [1, x]]
+            sage: rset = set([(1, -1), (y, 1), (17/3*a, 3/2), (1, x)])
+            sage: set([(pair[0],pair[1]) for pair in p.coefficients(x)]) == rset
+            True
             sage: p.coefficients(x, sparse=False)
             Traceback (most recent call last):
             ...
@@ -8383,7 +8384,7 @@ cdef class Expression(CommutativeRingElement):
 
             sage: a,b,c,d,e,y = var('a,b,c,d,e,y')
             sage: ((x - 2*y)^4/(x^2 - 4*y^2)^2).normalize()
-            (x^2 - 4*x*y + 4*y^2)/(x^2 + 4*x*y + 4*y^2)
+            (x - 2*y)^2/(x + 2*y)^2
             sage: f = ((x - 2*y)^4/(x^2 - 4*y^2)^2 + 1)*(y + a)*(2*y + x) / (4*y^2 + x^2)
             sage: f.normalize()
             2*(a + y)/(x + 2*y)
