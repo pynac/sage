@@ -8353,7 +8353,7 @@ cdef class Expression(CommutativeRingElement):
             sage: f.combine()
             ((x - 1)*x + y^2)/(x^2 - 7) + (b + c)/a + 1/(x + 1)
         """
-        return self.parent()(self._maxima_().combine())
+        return new_Expression_from_GEx(self._parent, self._gobj.combine_fractions())
 
     def normalize(self):
         """
