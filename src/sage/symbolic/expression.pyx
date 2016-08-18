@@ -8350,11 +8350,14 @@ cdef class Expression(CommutativeRingElement):
         else:
             return v[0]
 
-    def combine(self):
+    def combine(self, bint deep=False):
         r"""
         Return a simplified version of this symbolic expression
-        by combining all terms with the same denominator into a single
-        term.
+        by combining all toplevel terms with the same denominator into
+        a single term.
+
+        Please use the keyword ``deep=True`` to apply the process
+        recursively.
 
         EXAMPLES::
 
@@ -8364,8 +8367,17 @@ cdef class Expression(CommutativeRingElement):
             (x - 1)*x/(x^2 - 7) + y^2/(x^2 - 7) + b/a + c/a + 1/(x + 1)
             sage: f.combine()
             ((x - 1)*x + y^2)/(x^2 - 7) + (b + c)/a + 1/(x + 1)
+            sage: (1/x + 1/x^2 + (x+1)/x).combine()
+            (x + 2)/x + 1/x^2
+            sage: ex = 1/x + ((x + 1)/x - 1/x)/x^2 + (x+1)/x; ex
+            (x + 1)/x + 1/x + ((x + 1)/x - 1/x)/x^2
+            sage: ex.combine()
+            (x + 2)/x + ((x + 1)/x - 1/x)/x^2
+            sage: ex.combine(deep=True)
+            (x + 2)/x + 1/x^2
         """
-        return new_Expression_from_GEx(self._parent, self._gobj.combine_fractions())
+        return new_Expression_from_GEx(self._parent,
+                self._gobj.combine_fractions(deep))
 
     def normalize(self):
         """
