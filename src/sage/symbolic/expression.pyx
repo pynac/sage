@@ -8375,6 +8375,8 @@ cdef class Expression(CommutativeRingElement):
             (x + 2)/x + ((x + 1)/x - 1/x)/x^2
             sage: ex.combine(deep=True)
             (x + 2)/x + 1/x^2
+            sage: (1+sin((x + 1)/x - 1/x)).combine(deep=True)
+            sin(1) + 1
         """
         return new_Expression_from_GEx(self._parent,
                 self._gobj.combine_fractions(deep))
