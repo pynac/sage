@@ -4303,6 +4303,13 @@ cdef class Expression(CommutativeRingElement):
 
             sage: ((x+sqrt(2)*x)^2).expand()
             2*sqrt(2)*x^2 + 3*x^2
+
+        Check that exactness is preserved::
+
+            sage: ((x+1.001)^2).expand()
+            x^2 + 2.00200000000000*x + 1.00200100000000
+            sage: ((x+1.001)^3).expand()
+            x^3 + 3.00300000000000*x^2 + 3.00600300000000*x + 1.00300300100000
         """
         if side is not None:
             if not is_a_relational(self._gobj):
