@@ -3545,7 +3545,7 @@ cdef class Expression(CommutativeRingElement):
         """
         return print_order_compare_mul(left._gobj, right._gobj)
 
-    def __pow__(self, exp):
+    def __pow__(self, exp, ignored):
         """
         Return self raised to the power of exp.
 
