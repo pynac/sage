@@ -4292,6 +4292,13 @@ cdef class Expression(CommutativeRingElement):
             x^2 + 2.00200000000000*x + 1.00200100000000
             sage: ((x+1.001)^3).expand()
             x^3 + 3.00300000000000*x^2 + 3.00600300000000*x + 1.00300300100000
+
+        Check that :trac:`21302` is fixed::
+
+            sage: ((x+1)^-2).expand()
+            1/(x^2 + 2*x + 1)
+            sage: (((x-1)/(x+1))^2).expand()
+            x^2/(x^2 + 2*x + 1) - 2*x/(x^2 + 2*x + 1) + 1/(x^2 + 2*x + 1)
         """
         if side is not None:
             if not is_a_relational(self._gobj):
@@ -9354,8 +9361,9 @@ cdef class Expression(CommutativeRingElement):
         ALIAS: :meth:`rational_simplify` and :meth:`simplify_rational`
         are the same
 
-        DETAILS: We call Maxima functions ratsimp, fullratsimp and
-        xthru. If each part of the expression has to be simplified
+        DETAILS: We call Maxima functions ``ratsimp``, ``fullratsimp``
+        and ``xthru``, depending on the ``algorithm`` keyword.
+        If each part of the expression has to be simplified
         separately, we use Maxima function map.
 
         EXAMPLES::
