@@ -1390,7 +1390,7 @@ cdef class Expression(CommutativeRingElement):
         try:
             return float(self._eval_self(float))
         except TypeError:
-            raise TypeError("unable to simplify to float approximation")
+            raise TypeError("unable to simplify to float approximation: " + self)
 
     def __complex__(self):
         """
@@ -5797,8 +5797,8 @@ cdef class Expression(CommutativeRingElement):
 
         The behaviour is undefined with noninteger or negative exponents::
 
-            sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + x^x + 5*x^y
-            sage: rset = set([(1, -1), (y, 1), (17/3*a, 3/2), (x^x, 0), (5, y)])
+            sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + 2*x^x + 5*x^y
+            sage: rset = set([(1, -1), (y, 1), (17/3*a, 3/2), (2, x), (5, y)])
             sage: all([(pair[0],pair[1]) in rset for pair in p.coefficients(x)])
             True
             sage: p.coefficients(x, sparse=False)
@@ -5835,6 +5835,12 @@ cdef class Expression(CommutativeRingElement):
             sage: f.coefficients(g)
             [[t, 0], [3, 1], [1, 2]]
 
+        Handle bound variable strictly as part of a constant::
+
+            sage: (sin(1+x)*sin(1+x^2)).coefficients(x)
+            [[sin(x^2 + 1)*sin(x + 1), 0]]
+            sage: (sin(1+x)*sin(1+x^2)*x).coefficients(x)
+            [[sin(x^2 + 1)*sin(x + 1), 1]]
         """
         cdef vector[pair[GEx,GEx]] vec
         cdef pair[GEx,GEx] gexpair
