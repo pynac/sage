@@ -1390,7 +1390,7 @@ cdef class Expression(CommutativeRingElement):
         try:
             return float(self._eval_self(float))
         except TypeError:
-            raise TypeError("unable to simplify to float approximation: " + self)
+            raise TypeError("unable to simplify to float approximation: " + repr(self))
 
     def __complex__(self):
         """
