@@ -107,7 +107,7 @@ cdef extern from "sage/symbolic/ginac_wrap.h":
         GEx tcoeff(GEx expr)          except +
         void coefficients(GEx s, vector[pair[GEx,GEx]]) except +
         GEx combine_fractions(bint deep) except +
-        GEx normal()                  except +
+        GEx normal(int level, bint noexpand_combined, bint noexpand_frac) except +
         GEx numer()                   except +
         GEx denom()                   except +
         GEx numer_denom()             except +

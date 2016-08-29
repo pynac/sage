@@ -8433,7 +8433,7 @@ cdef class Expression(CommutativeRingElement):
         ALGORITHM: Uses GiNaC.
 
         """
-        return new_Expression_from_GEx(self._parent, self._gobj.normal())
+        return new_Expression_from_GEx(self._parent, self._gobj.normal(0, False, True))
 
     def numerator(self, bint normalize = True):
         """
@@ -9433,9 +9433,9 @@ cdef class Expression(CommutativeRingElement):
         if algorithm == 'full':
             maxima_method = 'fullratsimp'
         elif algorithm == 'simple':
-            maxima_method = 'ratsimp'
+            return new_Expression_from_GEx(self._parent, self._gobj.normal(0, False, False))
         elif algorithm == 'noexpand':
-            maxima_method = 'xthru'
+            return new_Expression_from_GEx(self._parent, self._gobj.normal(0, True, True))
         else:
             raise NotImplementedError("unknown algorithm, see the help for available algorithms")
         P = self_m.parent()
