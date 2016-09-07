@@ -1191,7 +1191,7 @@ cdef class Expression(CommutativeRingElement):
         except TypeError as err:
             # try the evaluation again with the complex field
             # corresponding to the parent R
-            if R is float:
+            if R in (float, complex):
                 R_complex = complex
             else:
                 try:
@@ -1387,10 +1387,19 @@ cdef class Expression(CommutativeRingElement):
             ...
             TypeError: unable to simplify to float approximation
         """
+        from sage.functions.other import real, imag
         try:
-            return float(self._eval_self(float))
+            ret = float(self._eval_self(float))
         except TypeError:
-            raise TypeError("unable to simplify to float approximation")
+            try:
+                c = (self._eval_self(complex))
+                if imag(c) == 0:
+                    ret = real(c)
+                else:
+                    raise
+            except TypeError:
+                raise TypeError("unable to simplify to float approximation")
+        return ret
 
     def __complex__(self):
         """
@@ -3552,8 +3561,6 @@ cdef class Expression(CommutativeRingElement):
         INPUT:
 
         - ``exp`` -- something that coerces to a symbolic expression.
-        - ``ignored`` -- the second argument that should accept a modulus
-          is actually ignored.
 
         OUTPUT:
 
@@ -3571,22 +3578,6 @@ cdef class Expression(CommutativeRingElement):
             x^(sin(x)^cos(y))
 
         TESTS::
-
-            sage: (Mod(2,7)*x^2 + Mod(2,7))^7
-            (2*x^2 + 2)^7
-
-        The leading coefficient in the result above is 1 since::
-
-            sage: t = Mod(2,7); gcd(t, t)^7
-            1
-            sage: gcd(t,t).parent()
-            Ring of integers modulo 7
-
-        ::
-
-            sage: k = GF(7)
-            sage: f = expand((k(1)*x^5 + k(1)*x^2 + k(2))^7); f
-            x^35 + x^14 + 2
 
             sage: x^oo
             Traceback (most recent call last):
@@ -4303,6 +4294,20 @@ cdef class Expression(CommutativeRingElement):
 
             sage: ((x+sqrt(2)*x)^2).expand()
             2*sqrt(2)*x^2 + 3*x^2
+
+        Check that exactness is preserved::
+
+            sage: ((x+1.001)^2).expand()
+            x^2 + 2.00200000000000*x + 1.00200100000000
+            sage: ((x+1.001)^3).expand()
+            x^3 + 3.00300000000000*x^2 + 3.00600300000000*x + 1.00300300100000
+
+        Check that :trac:`21302` is fixed::
+
+            sage: ((x+1)^-2).expand()
+            1/(x^2 + 2*x + 1)
+            sage: (((x-1)/(x+1))^2).expand()
+            x^2/(x^2 + 2*x + 1) - 2*x/(x^2 + 2*x + 1) + 1/(x^2 + 2*x + 1)
         """
         if side is not None:
             if not is_a_relational(self._gobj):
@@ -5801,8 +5806,8 @@ cdef class Expression(CommutativeRingElement):
 
         The behaviour is undefined with noninteger or negative exponents::
 
-            sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + x^x + 5*x^y
-            sage: rset = set([(1, -1), (y, 1), (17/3*a, 3/2), (x^x, 0), (5, y)])
+            sage: p = (17/3*a)*x^(3/2) + x*y + 1/x + 2*x^x + 5*x^y
+            sage: rset = set([(1, -1), (y, 1), (17/3*a, 3/2), (2, x), (5, y)])
             sage: all([(pair[0],pair[1]) in rset for pair in p.coefficients(x)])
             True
             sage: p.coefficients(x, sparse=False)
@@ -5839,6 +5844,12 @@ cdef class Expression(CommutativeRingElement):
             sage: f.coefficients(g)
             [[t, 0], [3, 1], [1, 2]]
 
+        Handle bound variable strictly as part of a constant::
+
+            sage: (sin(1+x)*sin(1+x^2)).coefficients(x)
+            [[sin(x^2 + 1)*sin(x + 1), 0]]
+            sage: (sin(1+x)*sin(1+x^2)*x).coefficients(x)
+            [[sin(x^2 + 1)*sin(x + 1), 1]]
         """
         cdef vector[pair[GEx,GEx]] vec
         cdef pair[GEx,GEx] gexpair
@@ -8350,11 +8361,14 @@ cdef class Expression(CommutativeRingElement):
         else:
             return v[0]
 
-    def combine(self):
+    def combine(self, bint deep=False):
         r"""
         Return a simplified version of this symbolic expression
-        by combining all terms with the same denominator into a single
-        term.
+        by combining all toplevel terms with the same denominator into
+        a single term.
+
+        Please use the keyword ``deep=True`` to apply the process
+        recursively.
 
         EXAMPLES::
 
@@ -8364,8 +8378,19 @@ cdef class Expression(CommutativeRingElement):
             (x - 1)*x/(x^2 - 7) + y^2/(x^2 - 7) + b/a + c/a + 1/(x + 1)
             sage: f.combine()
             ((x - 1)*x + y^2)/(x^2 - 7) + (b + c)/a + 1/(x + 1)
+            sage: (1/x + 1/x^2 + (x+1)/x).combine()
+            (x + 2)/x + 1/x^2
+            sage: ex = 1/x + ((x + 1)/x - 1/x)/x^2 + (x+1)/x; ex
+            (x + 1)/x + 1/x + ((x + 1)/x - 1/x)/x^2
+            sage: ex.combine()
+            (x + 2)/x + ((x + 1)/x - 1/x)/x^2
+            sage: ex.combine(deep=True)
+            (x + 2)/x + 1/x^2
+            sage: (1+sin((x + 1)/x - 1/x)).combine(deep=True)
+            sin(1) + 1
         """
-        return new_Expression_from_GEx(self._parent, self._gobj.combine_fractions())
+        return new_Expression_from_GEx(self._parent,
+                self._gobj.combine_fractions(deep))
 
     def normalize(self):
         """
@@ -8408,7 +8433,7 @@ cdef class Expression(CommutativeRingElement):
         ALGORITHM: Uses GiNaC.
 
         """
-        return new_Expression_from_GEx(self._parent, self._gobj.normal())
+        return new_Expression_from_GEx(self._parent, self._gobj.normal(0, False, True))
 
     def numerator(self, bint normalize = True):
         """
@@ -9351,8 +9376,9 @@ cdef class Expression(CommutativeRingElement):
         ALIAS: :meth:`rational_simplify` and :meth:`simplify_rational`
         are the same
 
-        DETAILS: We call Maxima functions ratsimp, fullratsimp and
-        xthru. If each part of the expression has to be simplified
+        DETAILS: We call Maxima functions ``ratsimp``, ``fullratsimp``
+        and ``xthru``, depending on the ``algorithm`` keyword.
+        If each part of the expression has to be simplified
         separately, we use Maxima function map.
 
         EXAMPLES::
@@ -9407,9 +9433,9 @@ cdef class Expression(CommutativeRingElement):
         if algorithm == 'full':
             maxima_method = 'fullratsimp'
         elif algorithm == 'simple':
-            maxima_method = 'ratsimp'
+            return new_Expression_from_GEx(self._parent, self._gobj.normal(0, False, False))
         elif algorithm == 'noexpand':
-            maxima_method = 'xthru'
+            return new_Expression_from_GEx(self._parent, self._gobj.normal(0, True, True))
         else:
             raise NotImplementedError("unknown algorithm, see the help for available algorithms")
         P = self_m.parent()
