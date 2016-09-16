@@ -1184,6 +1184,12 @@ cdef class Expression(CommutativeRingElement):
             1.54308063481524
             sage: float(cos(I))
             1.5430806348152437
+
+        TESTS::
+
+            sage: e = sqrt(2)/sqrt(abs(-(I - 1)*sqrt(2) - I - 1))
+            sage: e._eval_self(float)
+            0.9036020036...
         """
         cdef GEx res
         try:
@@ -1200,7 +1206,13 @@ cdef class Expression(CommutativeRingElement):
                     raise err
             res = self._gobj.evalf(0, {'parent':R_complex})
         if is_a_numeric(res):
-            return R(py_object_from_numeric(res))
+            ans = py_object_from_numeric(res)
+            # Convert ans to R.
+            if R is float and isinstance(ans, complex) and not ans.imag:
+                # Python does not automatically convert "real" complex
+                # numbers to floats, so we do this manually:
+                ans = ans.real
+            return R(ans)
         else:
             raise TypeError("Cannot evaluate symbolic expression to a numeric value.")
 
@@ -1386,6 +1398,11 @@ cdef class Expression(CommutativeRingElement):
             Traceback (most recent call last):
             ...
             TypeError: unable to simplify to float approximation
+
+        TESTS::
+
+            sage: float(sqrt(2)/sqrt(abs(-(I - 1)*sqrt(2) - I - 1)))
+            0.9036020036...
         """
         from sage.functions.other import real, imag
         try:
@@ -3579,6 +3596,22 @@ cdef class Expression(CommutativeRingElement):
 
         TESTS::
 
+            sage: (Mod(2,7)*x^2 + Mod(2,7))^7
+            (2*x^2 + 2)^7
+
+        The leading coefficient in the result above is 1 since::
+
+            sage: t = Mod(2,7); gcd(t, t)^7
+            1
+            sage: gcd(t,t).parent()
+            Ring of integers modulo 7
+
+        ::
+
+            sage: k = GF(7)
+            sage: f = expand((k(1)*x^5 + k(1)*x^2 + k(2))^7); f # known bug
+            x^35 + x^14 + 2
+
             sage: x^oo
             Traceback (most recent call last):
             ...
@@ -3855,7 +3888,7 @@ cdef class Expression(CommutativeRingElement):
 
             sage: f = function('f')
             sage: f(x)*f(x).derivative(x)*f(x).derivative(x,2)
-            f(x)*D[0](f)(x)*D[0, 0](f)(x)
+            f(x)*diff(f(x), x)*diff(f(x), x, x)
             sage: g = f(x).diff(x)
             sage: h = f(x).diff(x)*sin(x)
             sage: h/g
@@ -5195,7 +5228,7 @@ cdef class Expression(CommutativeRingElement):
 
             sage: f = function('f')
             sage: a = f(x).diff(x); a
-            D[0](f)(x)
+            diff(f(x), x)
             sage: a.operator()
             D[0](f)
 
