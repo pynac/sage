@@ -324,7 +324,7 @@ class Function_log2(GinacFunction):
             -I*log(3)/pi
             sage: log(int(8),2)
             3
-            sage: log(8,int(2))
+            sage: log(8,int(2))  # known bug, see #21518
             3
             sage: log(8,2)
             3
@@ -332,7 +332,7 @@ class Function_log2(GinacFunction):
             -3
             sage: log(1/8,1/2)
             3
-            sage: log(8,1/2)
+            sage: log(8,1/2)  # known bug, see #21517
             -3
         """
         def __init__(self):
