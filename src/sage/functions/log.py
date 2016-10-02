@@ -324,7 +324,7 @@ class Function_log2(GinacFunction):
             sage: log(x).operator() is ln
             True
 
-            sage: log(1000, 10, base=5)
+            sage: log(1000, 10)
             3
             sage: log(3,-1)
             -I*log(3)/pi
@@ -340,6 +340,11 @@ class Function_log2(GinacFunction):
             3
             sage: log(8,1/2)  # known bug, see #21517
             -3
+
+            sage: log(1000, 10, base=5)
+            Traceback (most recent call last):
+            ...
+            TypeError: Symbolic function log takes at most 2 arguments (3 given)
         """
         def __init__(self):
             GinacFunction.__init__(self, 'log', ginac_name='logb', nargs=2,
@@ -348,19 +353,25 @@ class Function_log2(GinacFunction):
 
 logb = Function_log2()
 
-def log(x, *args, **kwds):
+def log(*args, **kwds):
+    base = kwds.pop('base', None)
+    if base:
+        args = args + (base,)
+    print(args)
     if not args:
-        return ln(x, **kwds)
-    if len(args) > 1:
-        raise TypeError("Symbolic function log takes at most 2 arguments (%s given)"%(len(args)+1))
+        raise TypeError("Symbolic function log takes at least 1 arguments (0 given)")
+    if len(args) == 1:
+        return ln(args[0], **kwds)
+    if len(args) > 2:
+        raise TypeError("Symbolic function log takes at most 2 arguments (%s given)"%(len(args)+1-(base is not None)))
     try:
-        return x.log(args[0])
+        return args[0].log(args[1])
     except ValueError as ex:
         if repr(ex)[12:27] == "No discrete log":
             raise
-        return logb(x, args[0])
+        return logb(args[0], args[1])
     except (AttributeError, TypeError):
-        return logb(x, args[0])
+        return logb(args[0], args[1])
 
 class Function_polylog(GinacFunction):
     def __init__(self):
