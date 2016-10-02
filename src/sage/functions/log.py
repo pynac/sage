@@ -357,7 +357,6 @@ def log(*args, **kwds):
     base = kwds.pop('base', None)
     if base:
         args = args + (base,)
-    print(args)
     if not args:
         raise TypeError("Symbolic function log takes at least 1 arguments (0 given)")
     if len(args) == 1:
