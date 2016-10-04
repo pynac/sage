@@ -1478,11 +1478,14 @@ class Func_ultraspherical(GinacFunction):
         sage: gegenbauer(2,a,x)
         2*(a + 1)*a*x^2 - a
         sage: gegenbauer(3,a,x)
-        2/3*(2*(a + 1)*a*x^2 - a)*(a + 2)*x - 2/3*(2*a + 1)*a*x
+        4/3*(a + 2)*(a + 1)*a*x^3 - 2*(a + 1)*a*x
         sage: gegenbauer(3,a,x).expand()
         4/3*a^3*x^3 + 4*a^2*x^3 + 8/3*a*x^3 - 2*a^2*x - 2*a*x
         sage: gegenbauer(10,a,x).expand().coefficient(x,2)
         1/12*a^6 + 5/4*a^5 + 85/12*a^4 + 75/4*a^3 + 137/6*a^2 + 10*a
+        sage: ex = gegenbauer(100,a,x)
+        sage: (ex.subs(a==55/98) - gegenbauer(100,55/98,x)).is_trivial_zero()
+        True
 
     TESTS:
 
