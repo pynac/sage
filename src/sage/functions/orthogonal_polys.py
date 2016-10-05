@@ -1474,7 +1474,7 @@ class Func_ultraspherical(GinacFunction):
         sage: ultraspherical(5,9/10,RealField(100)(pi))
         6949.4695419382702451843080687
 
-        sage: _ = var('a')
+        sage: _ = var('a n')
         sage: gegenbauer(2,a,x)
         2*(a + 1)*a*x^2 - a
         sage: gegenbauer(3,a,x)
@@ -1486,6 +1486,15 @@ class Func_ultraspherical(GinacFunction):
         sage: ex = gegenbauer(100,a,x)
         sage: (ex.subs(a==55/98) - gegenbauer(100,55/98,x)).is_trivial_zero()
         True
+
+        sage: derivative(gegenbauer(n,a,x),x)
+        2*a*gegenbauer(n - 1, a + 1, x)
+        sage: derivative(gegenbauer(3,a,x),x)
+        4*(a + 2)*(a + 1)*a*x^2 - 2*(a + 1)*a
+        sage: derivative(gegenbauer(n,a,x),a)
+        Traceback (most recent call last):
+        ...
+        RuntimeError: derivative w.r.t. to the second index is not supported yet
 
     TESTS:
 
