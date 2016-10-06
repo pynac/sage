@@ -1327,6 +1327,12 @@ class Func_hermite(GinacFunction):
         Traceback (most recent call last):
         ...
         RuntimeError: hermite_eval: The index n must be a nonnegative integer
+
+        sage: _ = var('m x')
+        sage: hermite(m, x).diff(m)
+        Traceback (most recent call last):
+        ...
+        RuntimeError: derivative w.r.t. to the index is not supported yet
     """
     def __init__(self):
         r"""
