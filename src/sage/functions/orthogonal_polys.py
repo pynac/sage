@@ -254,7 +254,7 @@ Patashnik in their book Concrete Mathematics.
 REFERENCES:
 
 .. [ASHandbook] Abramowitz and Stegun: Handbook of Mathematical Functions,
-    http://www.math.sfu.ca/ cbm/aands/
+    http://www.math.sfu.ca/~cbm/aands/
 
 .. :wikipedia:`Chebyshev_polynomials`
 
@@ -1445,11 +1445,25 @@ def legendre_Q(n, x):
 
 
 class Func_ultraspherical(GinacFunction):
-    """
-    Returns the ultraspherical (or Gegenbauer) polynomial for integers
-    `n > -1`.
+    r"""
+    Return the ultraspherical (or Gegenbauer) polynomial gegenbauer(n,a,x),
 
-    Computed using Maxima.
+    .. math::
+
+        C_n^{a}(x)=\sum_{k=0}^{\lfloor n/2\rfloor} (-1)^k\frac{\Gamma(n-k+a)}
+        {\Gamma(a)k!(n-2k)!}(2x)^{n-2k}.
+
+    When `n` is a nonnegative integer, this formula gives a
+    polynomial in `z` of degree `n`, but all parameters are
+    permitted to be complex numbers. When `a = 1/2`, the
+    Gegenbauer polynomial reduces to a Legendre polynomial.
+
+    Computed using Pynac.
+
+    For numerical evaluation, consider using the `mpmath library,
+    <http://mpmath.org/doc/current/functions/orthogonal.html#gegenbauer-polynomials>`_,
+    as it also allows complex numbers (and negative `n` as well);
+    see the examples below.
 
     REFERENCE:
 
@@ -1462,15 +1476,12 @@ class Func_ultraspherical(GinacFunction):
         sage: x = PolynomialRing(QQ, 'x').gen()
         sage: ultraspherical(2,3/2,x)
         15/2*x^2 - 3/2
-        sage: ultraspherical(2,1/2,x)
-        3/2*x^2 - 1/2
         sage: ultraspherical(1,1,x)
         2*x
         sage: t = PolynomialRing(RationalField(),"t").gen()
         sage: gegenbauer(3,2,t)
         32*t^3 - 12*t
-        sage: var('x')
-        x
+        sage: var('x');
         sage: for N in range(100):
         ....:     n = ZZ.random_element().abs() + 5
         ....:     a = QQ.random_element().abs() + 5
@@ -1493,6 +1504,15 @@ class Func_ultraspherical(GinacFunction):
         sage: (ex.subs(a==55/98) - gegenbauer(100,55/98,x)).is_trivial_zero()
         True
 
+        sage: gegenbauer(2,-3,x)
+        12*x^2 + 3
+        sage: gegenbauer(120,-99/2,3)
+        1654502372608570682112687530178328494861923493372493824
+        sage: gegenbauer(5,9/2,x)
+        21879/8*x^5 - 6435/4*x^3 + 1287/8*x
+        sage: gegenbauer(15,3/2,5)
+        3903412392243800
+
         sage: derivative(gegenbauer(n,a,x),x)
         2*a*gegenbauer(n - 1, a + 1, x)
         sage: derivative(gegenbauer(3,a,x),x)
@@ -1501,6 +1521,16 @@ class Func_ultraspherical(GinacFunction):
         Traceback (most recent call last):
         ...
         RuntimeError: derivative w.r.t. to the second index is not supported yet
+
+    Numerical evaluation with the mpmath library::
+
+        sage: from mpmath import gegenbauer as gegenbauer_mp
+        sage: from mpmath import mp
+        sage: mp.pretty = True; mp.dps=25
+        sage: gegenbauer_mp(-7,0.5,0.3)
+        0.1291811875
+        sage: gegenbauer_mp(2+3j, -0.75, -1000j)
+        (-5038991.358609026523401901 + 9414549.285447104177860806j)
 
     TESTS:
 
@@ -1519,7 +1549,9 @@ class Func_ultraspherical(GinacFunction):
         Traceback (most recent call last):
         ...
         RuntimeError: gegenb_eval: The index n must be a nonnegative integer
+
     """
+
     def __init__(self):
         r"""
         Init method for the ultraspherical polynomials.
