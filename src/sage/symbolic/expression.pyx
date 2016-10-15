@@ -4082,7 +4082,7 @@ cdef class Expression(CommutativeRingElement):
             prec = order
         sig_on()
         try:
-            x = self._gobj.expand(0).series(symbol0._gobj, prec, 0)
+            x = self._gobj.expand(0).series(symbol0._gobj, prec, 2)
             nex = SymbolicSeries.__new__(SymbolicSeries)
             nex._parent = self._parent
             GEx_construct_ex(&nex._gobj, x)
