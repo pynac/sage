@@ -128,7 +128,9 @@ cdef class SymbolicSeries(Expression):
         Return True if the series is without order term.
 
         A series is terminating if it can be represented exactly,
-        without requiring an order term.
+        without requiring an order term. You can explicitly
+        request terminating series by setting the order to
+        positive infinity.
 
         OUTPUT:
 
@@ -136,9 +138,9 @@ cdef class SymbolicSeries(Expression):
 
         EXAMPLES::
 
-            sage: (x^5+x^2+1).series(x,10)
+            sage: (x^5+x^2+1).series(x, +oo)
             1 + 1*x^2 + 1*x^5
-            sage: (x^5+x^2+1).series(x,10).is_terminating_series()
+            sage: (x^5+x^2+1).series(x,+oo).is_terminating_series()
             True
             sage: SR(5).is_terminating_series()
             False
