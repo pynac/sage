@@ -34,11 +34,15 @@ it back to a polynomial::
     sage: h.expand()
     x^3 - x^2*sin(y) - 5*x + 3
 
-We compute another series expansion of an analytic function::
+We compute another series expansion of an analytic function. Note
+that precision includes negative exponents so the actual order term
+may be shifted left::
 
+    sage: sin(x).series(x,7)
+    1*x + (-1/6)*x^3 + 1/120*x^5 + Order(x^7)
     sage: f = sin(x)/x^2
     sage: f.series(x,7)
-    1*x^(-1) + (-1/6)*x + 1/120*x^3 + (-1/5040)*x^5 + Order(x^7)
+    1*x^(-1) + (-1/6)*x + 1/120*x^3 + Order(x^5)
     sage: f.series(x==1,3)
     (sin(1)) + (cos(1) - 2*sin(1))*(x - 1) + (-2*cos(1) + 5/2*sin(1))*(x - 1)^2 + Order((x - 1)^3)
     sage: f.series(x==1,3).truncate().expand()
@@ -166,9 +170,9 @@ cdef class SymbolicSeries(Expression):
             sage: f.truncate()
             sin(x)/x^2
             sage: f.series(x,7)
-            1*x^(-1) + (-1/6)*x + 1/120*x^3 + (-1/5040)*x^5 + Order(x^7)
+            1*x^(-1) + (-1/6)*x + 1/120*x^3 + Order(x^5)
             sage: f.series(x,7).truncate()
-            -1/5040*x^5 + 1/120*x^3 - 1/6*x + 1/x
+            1/120*x^3 - 1/6*x + 1/x
             sage: f.series(x==1,3).truncate().expand()
             -2*x^2*cos(1) + 5/2*x^2*sin(1) + 5*x*cos(1) - 7*x*sin(1) - 3*cos(1) + 11/2*sin(1)
         """
