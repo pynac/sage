@@ -4077,7 +4077,7 @@ cdef class Expression(CommutativeRingElement):
         cdef Expression symbol0 = self.coerce_in(symbol)
         cdef GEx x
         cdef SymbolicSeries nex
-        cdef int prec
+        cdef int cprec
         cdef int options
         if order is infinity:
             options = 0
@@ -4087,12 +4087,12 @@ cdef class Expression(CommutativeRingElement):
 
         if order is None:
             from sage.misc.defaults import series_precision
-            prec = series_precision()
+            cprec = series_precision()
         else:
-            prec = order
+            cprec = order
         sig_on()
         try:
-            x = self._gobj.expand(0).series(symbol0._gobj, prec, options)
+            x = self._gobj.expand(0).series(symbol0._gobj, cprec, options)
             nex = SymbolicSeries.__new__(SymbolicSeries)
             nex._parent = self._parent
             GEx_construct_ex(&nex._gobj, x)
