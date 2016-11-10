@@ -751,7 +751,7 @@ class Func_chebyshev_T(ChebyshevFunction):
     def eval_formula(self, n, x):
         """
         Evaluate ``chebyshev_T`` using an explicit formula.
-        See [AS1964]_ 227 (p. 782) for details for the recurions.
+        See [AS1964]_ 227 (p. 782) for details for the recursions.
         See also [Koe1999]_ for fast evaluation techniques.
 
         INPUT:
@@ -958,7 +958,8 @@ class Func_chebyshev_U(ChebyshevFunction):
     def eval_formula(self, n, x):
         """
         Evaluate ``chebyshev_U`` using an explicit formula.
-        See [AS1964]_ 227 (p. 782) for details on the recurions.
+
+        See [AS1964]_ 227 (p. 782) for details on the recursions.
         See also [Koe1999]_ for the recursion formulas.
 
         INPUT:
@@ -1444,7 +1445,7 @@ class Func_ultraspherical(GinacFunction):
     r"""
     Return the ultraspherical (or Gegenbauer) polynomial gegenbauer(n,a,x),
 
-    .. math::
+    .. MATH::
 
         C_n^{a}(x)=\sum_{k=0}^{\lfloor n/2\rfloor} (-1)^k\frac{\Gamma(n-k+a)}
         {\Gamma(a)k!(n-2k)!}(2x)^{n-2k}.
