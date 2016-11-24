@@ -897,11 +897,7 @@ class Function_gamma(GinacFunction):
             sage: float(gamma(8.5)) == gamma(8.5r) == float(gamma(mpmath.mpf(8.5)))
             True
 
-<<<<<<< HEAD
-        Check that QQbar half integers work with the ``pi`` formula::
-=======
         Check that ``QQbar`` half integers work with the ``pi`` formula::
->>>>>>> develop
 
             sage: gamma(QQbar(1/2))
             sqrt(pi)
