@@ -145,6 +145,7 @@ cdef extern from "sage/libs/pynac/wrap.h":
 
     # Algorithms
     GEx g_gcd "gcd"(GEx a, GEx b) except +
+    bint g_factor "factor"(GEx a, GEx b) except +
 
     # Pattern matching wildcards
     GEx g_wild "wild"(unsigned int label) except +
