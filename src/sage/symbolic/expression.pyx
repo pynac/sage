@@ -3839,7 +3839,7 @@ cdef class Expression(CommutativeRingElement):
             sage: g = derivative(f, x); g # this is a complex expression
             -1/2*((x^2 + 1)*x/(x^2 - 1)^2 - x/(x^2 - 1))/((x^2 + 1)/(x^2 - 1))^(3/4)
             sage: g.factor()
-            -((x + 1)*(x - 1)/(x^2 + 1))^(3/4)*x/((x + 1)^2*(x - 1)^2)
+            -x/((x + 1)^2*(x - 1)^2*((x^2 + 1)/(x^2 - 1))^(3/4))
 
         ::
 
@@ -10162,7 +10162,6 @@ cdef class Expression(CommutativeRingElement):
             (diff(f(x), x) + 1)*(diff(f(x), x) - 1)
         """
         from sage.calculus.calculus import symbolic_expression_from_maxima_string, symbolic_expression_from_string
-        cdef Expression res
         if len(dontfactor) > 0:
             m = self._maxima_()
             name = m.name()
@@ -10170,13 +10169,11 @@ cdef class Expression(CommutativeRingElement):
             cmd = 'block([dontfactor:[%s]],factor(%s))'%(varstr, name)
             return symbolic_expression_from_maxima_string(cmd)
         else:
-            res = new_Expression_from_pyobject(self.parent(), 0)
             try:
-                is_comp = g_factor(self._gobj, res._gobj)
-                if not is_comp:
-                    return self
-                else:
-                    return res
+                from sage.rings.all import QQ
+                f = self.polynomial(QQ)
+                w = repr(f.factor())
+                return symbolic_expression_from_string(w)
             except (TypeError, NotImplementedError):
                 pass
             return self.parent()(self._maxima_().factor())
